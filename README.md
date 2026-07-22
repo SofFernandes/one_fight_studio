@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# One Fight Studio — Portal de Alunas
 
-## Getting Started
+Portal para academia de luta: login de alunas, dados pessoais, fotos antes/atual,
+consulta de mensalidade, e dashboard de admin com receita mensal e alunas ativas.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router) + **Vercel** (hosting)
+- **Supabase** (Postgres + Auth + Storage)
+- **Tailwind + shadcn/ui**
+- WhatsApp Cloud API (fase 2 — mensageria de vencimento/aniversário)
+
+## Setup local
+
+1. Crie um projeto grátis em [supabase.com](https://supabase.com).
+2. Em **SQL Editor**, rode nesta ordem:
+   - `supabase/migrations/0001_init.sql`
+   - `supabase/migrations/0002_views_admin.sql`
+3. Copie `.env.example` para `.env.local` e preencha com as chaves de
+   **Project Settings > API** do seu projeto Supabase.
+4. Instale dependências e rode:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Abra [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Criando o primeiro admin
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Depois de criar uma conta pela tela de login (ela nasce com papel `aluna`
+por padrão), promova-a a admin rodando no SQL Editor do Supabase:
 
-## Learn More
+```sql
+update public.profiles set papel = 'admin' where id = '<uuid-do-usuario>';
+```
 
-To learn more about Next.js, take a look at the following resources:
+O UUID aparece em **Authentication > Users** no painel do Supabase.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Estrutura
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `app/login` — tela de login
+- `app/(portal)` — área da aluna (perfil, fotos, mensalidade) — protegida por `requireAluna()`
+- `app/(admin)` — dashboard admin (alunas, planos) — protegida por `requireAdmin()`
+- `app/actions` — Server Actions (auth, perfil, admin, planos)
+- `lib/supabase` — clientes Supabase (browser, server, proxy/sessão)
+- `lib/dal.ts` — Data Access Layer: única fonte de verdade sobre quem está logado e qual o papel
+- `supabase/migrations` — schema SQL (rodar manualmente no SQL Editor por enquanto)
 
-## Deploy on Vercel
+## Próximos passos (fase 2)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Cron diário (Vercel Cron) para: avisar mensalidade vencida e parabenizar aniversário via WhatsApp Cloud API
+- Geração automática de `mensalidades` todo início de mês a partir do `plano` vigente da aluna
+- Filtros/busca na listagem de alunas do admin
