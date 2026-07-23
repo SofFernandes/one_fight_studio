@@ -25,6 +25,7 @@ export function FormPlano({
         <div className="flex flex-1 flex-col gap-2">
           <Label htmlFor={`valor-${modalidade}`}>Valor (R$)</Label>
           <Input
+            key={planoAtual?.id ?? "novo"}
             id={`valor-${modalidade}`}
             name="valor"
             type="text"
