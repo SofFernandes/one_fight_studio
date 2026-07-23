@@ -42,7 +42,7 @@ export default async function EditarAlunaPage({
     <div className="flex flex-col gap-6">
       <h1 className="text-xl font-semibold">{aluna.nome_completo}</h1>
 
-      <Card>
+      <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle>Dados pessoais</CardTitle>
         </CardHeader>
@@ -51,7 +51,7 @@ export default async function EditarAlunaPage({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle>Mensalidade do mês</CardTitle>
         </CardHeader>

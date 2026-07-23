@@ -50,22 +50,25 @@ export default async function PerfilPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card>
+      <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle>Mensalidade</CardTitle>
         </CardHeader>
         <CardContent>
           {mensalidade ? (
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-sm text-muted-foreground">
                   Vencimento: {formatarData(mensalidade.vencimento)}
                 </p>
-                <p className="text-lg font-semibold">
+                <p className="text-2xl font-semibold text-primary">
                   {formatarReais(mensalidade.valor_centavos)}
                 </p>
               </div>
-              <Badge variant={corStatus[mensalidade.status]}>
+              <Badge
+                variant={corStatus[mensalidade.status]}
+                className="rounded-full px-3 py-1"
+              >
                 {rotuloStatus[mensalidade.status]}
               </Badge>
             </div>
@@ -77,7 +80,7 @@ export default async function PerfilPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle>Dados pessoais</CardTitle>
         </CardHeader>
@@ -86,7 +89,7 @@ export default async function PerfilPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle>Fotos</CardTitle>
         </CardHeader>

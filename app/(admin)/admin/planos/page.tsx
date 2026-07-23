@@ -30,7 +30,7 @@ export default async function AdminPlanosPage() {
     <div className="flex flex-col gap-6">
       <h1 className="text-xl font-semibold">Planos e valores</h1>
       {PLANOS_CONFIGURAVEIS.map(({ modalidade, nome, titulo }) => (
-        <Card key={modalidade}>
+        <Card key={modalidade} className="rounded-2xl">
           <CardHeader>
             <CardTitle>{titulo}</CardTitle>
           </CardHeader>

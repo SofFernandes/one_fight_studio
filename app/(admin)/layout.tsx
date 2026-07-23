@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/dal";
 import { logout } from "@/app/actions/auth";
@@ -11,26 +12,43 @@ export default async function AdminLayout({
   await requireAdmin();
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="border-b bg-background">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <nav className="flex items-center gap-4">
-            <span className="font-semibold">One Fight Studio — Admin</span>
-            <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground">
-              Alunas
-            </Link>
-            <Link href="/admin/planos" className="text-sm text-muted-foreground hover:text-foreground">
-              Planos
-            </Link>
-          </nav>
+    <div className="min-h-dvh bg-background">
+      <header className="sticky top-0 z-10 border-b border-border/60 bg-background/95 backdrop-blur">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-2.5">
+            <Image
+              src="/one_fight_logo.jpg"
+              alt="One Fight Studio"
+              width={36}
+              height={36}
+              className="rounded-xl"
+            />
+            <span className="hidden text-sm font-semibold tracking-wide sm:inline">
+              ONE FIGHT STUDIO — ADMIN
+            </span>
+          </div>
           <form action={logout}>
-            <Button variant="ghost" size="sm" type="submit">
+            <Button variant="ghost" size="sm" type="submit" className="rounded-xl">
               Sair
             </Button>
           </form>
         </div>
+        <nav className="mx-auto flex max-w-5xl gap-1 px-4 pb-2 sm:px-6">
+          <Link
+            href="/admin"
+            className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            Alunas
+          </Link>
+          <Link
+            href="/admin/planos"
+            className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          >
+            Planos
+          </Link>
+        </nav>
       </header>
-      <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-5xl px-4 py-6 sm:px-6">{children}</main>
     </div>
   );
 }

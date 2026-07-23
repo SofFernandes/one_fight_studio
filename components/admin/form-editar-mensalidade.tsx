@@ -37,6 +37,7 @@ export function FormEditarMensalidade({
           name="vencimento"
           type="date"
           defaultValue={mensalidade.vencimento}
+          className="h-11 rounded-xl"
           required
         />
       </div>
@@ -47,13 +48,14 @@ export function FormEditarMensalidade({
           name="valor"
           type="text"
           defaultValue={(mensalidade.valor_centavos / 100).toFixed(2)}
+          className="h-11 rounded-xl"
           required
         />
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="status">Status</Label>
         <Select name="status" defaultValue={mensalidade.status}>
-          <SelectTrigger id="status">
+          <SelectTrigger id="status" className="h-11 rounded-xl">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -68,9 +70,13 @@ export function FormEditarMensalidade({
         <p className="text-sm text-destructive">{estado.erro}</p>
       )}
       {estado?.sucesso && (
-        <p className="text-sm text-emerald-600">Mensalidade atualizada!</p>
+        <p className="text-sm text-emerald-400">Mensalidade atualizada!</p>
       )}
-      <Button type="submit" disabled={pending}>
+      <Button
+        type="submit"
+        disabled={pending}
+        className="h-11 rounded-xl font-semibold"
+      >
         {pending ? "Salvando..." : "Salvar mensalidade"}
       </Button>
     </form>

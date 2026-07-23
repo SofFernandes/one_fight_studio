@@ -28,13 +28,29 @@ export function UploadFoto({
 
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor={`foto-${tipo}`}>{label}</Label>
-      {fotoAtualUrl && (
-        <p className="text-xs text-muted-foreground">Foto já enviada.</p>
-      )}
-      <form action={handleSubmit} className="flex gap-2">
-        <Input id={`foto-${tipo}`} name="foto" type="file" accept="image/*" />
-        <Button type="submit" disabled={pending} variant="secondary">
+      <div className="flex items-center justify-between">
+        <Label htmlFor={`foto-${tipo}`}>{label}</Label>
+        {fotoAtualUrl && (
+          <span className="text-xs text-emerald-400">Foto enviada ✓</span>
+        )}
+      </div>
+      <form
+        action={handleSubmit}
+        className="flex flex-col gap-2 sm:flex-row sm:items-center"
+      >
+        <Input
+          id={`foto-${tipo}`}
+          name="foto"
+          type="file"
+          accept="image/*"
+          className="h-11 flex-1 rounded-xl file:h-full file:rounded-lg file:border-0 file:bg-secondary file:px-3 file:text-secondary-foreground"
+        />
+        <Button
+          type="submit"
+          disabled={pending}
+          variant="secondary"
+          className="h-11 rounded-xl sm:w-28"
+        >
           {pending ? "Enviando..." : "Enviar"}
         </Button>
       </form>

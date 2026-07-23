@@ -26,6 +26,7 @@ export function FormEditarAluna({ profile }: { profile: Profile }) {
           id="nome_completo"
           name="nome_completo"
           defaultValue={profile.nome_completo}
+          className="h-11 rounded-xl"
           required
         />
       </div>
@@ -36,6 +37,7 @@ export function FormEditarAluna({ profile }: { profile: Profile }) {
           name="telefone"
           placeholder="+5511999999999"
           defaultValue={profile.telefone ?? ""}
+          className="h-11 rounded-xl"
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -45,12 +47,13 @@ export function FormEditarAluna({ profile }: { profile: Profile }) {
           name="data_nascimento"
           type="date"
           defaultValue={profile.data_nascimento ?? ""}
+          className="h-11 rounded-xl"
         />
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="modalidade">Modalidade</Label>
         <Select name="modalidade" defaultValue={profile.modalidade ?? ""}>
-          <SelectTrigger id="modalidade">
+          <SelectTrigger id="modalidade" className="h-11 rounded-xl">
             <SelectValue placeholder="Selecione" />
           </SelectTrigger>
           <SelectContent>
@@ -66,9 +69,13 @@ export function FormEditarAluna({ profile }: { profile: Profile }) {
         <p className="text-sm text-destructive">{estado.erro}</p>
       )}
       {estado?.sucesso && (
-        <p className="text-sm text-emerald-600">Dados salvos!</p>
+        <p className="text-sm text-emerald-400">Dados salvos!</p>
       )}
-      <Button type="submit" disabled={pending}>
+      <Button
+        type="submit"
+        disabled={pending}
+        className="h-11 rounded-xl font-semibold"
+      >
         {pending ? "Salvando..." : "Salvar dados"}
       </Button>
     </form>

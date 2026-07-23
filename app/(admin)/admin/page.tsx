@@ -76,12 +76,12 @@ export default async function AdminAlunasPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Card>
+        <Card className="rounded-2xl">
           <CardHeader>
             <CardTitle>Receita do mês (paga)</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">
+            <p className="text-3xl font-semibold text-primary">
               {formatarReais(receita?.receita_paga_centavos ?? 0)}
             </p>
             <p className="text-sm text-muted-foreground">
@@ -89,23 +89,23 @@ export default async function AdminAlunasPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="rounded-2xl">
           <CardHeader>
             <CardTitle>Alunas ativas no mês</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">
+            <p className="text-3xl font-semibold text-primary">
               {ativas?.alunas_ativas ?? 0}
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="rounded-2xl">
         <CardHeader>
           <CardTitle>Alunas</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -144,6 +144,7 @@ export default async function AdminAlunasPage() {
                                 ? "destructive"
                                 : "secondary"
                           }
+                          className="rounded-full px-2.5"
                         >
                           {mensalidade.status}
                         </Badge>
@@ -154,7 +155,7 @@ export default async function AdminAlunasPage() {
                     <TableCell>
                       <Link
                         href={`/admin/alunas/${aluna.id}`}
-                        className="text-sm text-primary hover:underline"
+                        className="whitespace-nowrap text-sm font-medium text-primary hover:underline"
                       >
                         Editar
                       </Link>
