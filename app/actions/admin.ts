@@ -29,7 +29,7 @@ export async function atualizarAlunaAdmin(
   if (error) return { erro: "Não foi possível salvar." };
 
   revalidatePath(`/admin/alunas/${alunaId}`);
-  revalidatePath("/admin");
+  revalidatePath("/admin/alunas");
   return { sucesso: true };
 }
 
@@ -60,6 +60,7 @@ export async function atualizarMensalidadeAdmin(
   if (error) return { erro: "Não foi possível salvar a mensalidade." };
 
   revalidatePath(`/admin/alunas/${alunaId}`);
-  revalidatePath("/admin");
+  revalidatePath("/admin/alunas");
+  revalidatePath("/admin/dashboard");
   return { sucesso: true };
 }

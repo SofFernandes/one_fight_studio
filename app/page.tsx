@@ -5,6 +5,6 @@ export default async function Home() {
   const profile = await getProfile();
 
   if (!profile) redirect("/login");
-  if (profile.papel === "admin") redirect("/admin");
+  if (profile.papel === "admin") redirect("/admin/dashboard");
   redirect("/perfil");
 }
