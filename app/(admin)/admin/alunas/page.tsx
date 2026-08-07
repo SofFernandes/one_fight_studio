@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DialogAdicionarAluna } from "@/components/admin/dialog-adicionar-aluna";
 import type { Mensalidade, Profile } from "@/lib/types/database";
 
 function competenciaAtual() {
@@ -52,8 +53,9 @@ export default async function AdminAlunasPage() {
 
   return (
     <Card className="rounded-2xl">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between gap-3">
         <CardTitle>Alunas</CardTitle>
+        <DialogAdicionarAluna />
       </CardHeader>
       <CardContent className="overflow-x-auto">
         <Table>

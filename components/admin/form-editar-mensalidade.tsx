@@ -29,7 +29,11 @@ export function FormEditarMensalidade({
   const [estado, action, pending] = useActionState(acaoComIds, undefined);
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form
+      key={`${mensalidade.vencimento}-${mensalidade.valor_centavos}-${mensalidade.status}`}
+      action={action}
+      className="flex flex-col gap-4"
+    >
       <div className="flex flex-col gap-2">
         <Label htmlFor="vencimento">Vencimento</Label>
         <Input

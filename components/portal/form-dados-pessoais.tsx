@@ -21,7 +21,11 @@ export function FormDadosPessoais({ profile }: { profile: Profile }) {
   );
 
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <form
+      key={profile.atualizado_em}
+      action={action}
+      className="flex flex-col gap-4"
+    >
       <div className="flex flex-col gap-2">
         <Label htmlFor="nome_completo">Nome completo</Label>
         <Input
