@@ -124,6 +124,18 @@ export function DialogAdicionarAluna() {
               </SelectContent>
             </Select>
           </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="dia_vencimento">Dia de vencimento (1-28)</Label>
+            <Input
+              id="dia_vencimento"
+              name="dia_vencimento"
+              type="number"
+              min={1}
+              max={28}
+              placeholder="ex: 10"
+              className="h-11 rounded-xl"
+            />
+          </div>
           {erro && <p className="text-sm text-destructive">{erro}</p>}
           <Button
             type="submit"

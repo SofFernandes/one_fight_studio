@@ -16,6 +16,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { DialogAdicionarAluna } from "@/components/admin/dialog-adicionar-aluna";
+import {
+  derivarStatus,
+  rotuloStatusDerivado,
+  variantStatusDerivado,
+} from "@/lib/mensalidades";
 import type { Mensalidade, Profile } from "@/lib/types/database";
 
 function competenciaAtual() {
@@ -63,6 +68,7 @@ export default async function AdminAlunasPage() {
             <TableRow>
               <TableHead>Nome</TableHead>
               <TableHead>Modalidade</TableHead>
+              <TableHead>Dia venc.</TableHead>
               <TableHead>Vencimento</TableHead>
               <TableHead>Status</TableHead>
               <TableHead />
@@ -71,6 +77,9 @@ export default async function AdminAlunasPage() {
           <TableBody>
             {(alunas ?? []).map((aluna) => {
               const mensalidade = mensalidadePorAluna.get(aluna.id);
+              const statusDerivado = mensalidade
+                ? derivarStatus(mensalidade)
+                : null;
               return (
                 <TableRow key={aluna.id}>
                   <TableCell>{aluna.nome_completo}</TableCell>
@@ -79,6 +88,7 @@ export default async function AdminAlunasPage() {
                       ? rotuloModalidade[aluna.modalidade]
                       : "—"}
                   </TableCell>
+                  <TableCell>{aluna.dia_vencimento ?? "—"}</TableCell>
                   <TableCell>
                     {mensalidade
                       ? new Date(
@@ -87,18 +97,12 @@ export default async function AdminAlunasPage() {
                       : "—"}
                   </TableCell>
                   <TableCell>
-                    {mensalidade ? (
+                    {statusDerivado ? (
                       <Badge
-                        variant={
-                          mensalidade.status === "pago"
-                            ? "default"
-                            : mensalidade.status === "vencido"
-                              ? "destructive"
-                              : "secondary"
-                        }
+                        variant={variantStatusDerivado[statusDerivado]}
                         className="rounded-full px-2.5"
                       >
-                        {mensalidade.status}
+                        {rotuloStatusDerivado[statusDerivado]}
                       </Badge>
                     ) : (
                       "—"

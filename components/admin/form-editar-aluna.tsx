@@ -69,6 +69,22 @@ export function FormEditarAluna({ profile }: { profile: Profile }) {
           </SelectContent>
         </Select>
       </div>
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="dia_vencimento">Dia de vencimento (1-28)</Label>
+        <Input
+          id="dia_vencimento"
+          name="dia_vencimento"
+          type="number"
+          min={1}
+          max={28}
+          placeholder="ex: 10"
+          defaultValue={profile.dia_vencimento ?? ""}
+          className="h-11 rounded-xl"
+        />
+        <p className="text-xs text-muted-foreground">
+          Dia fixo em que a mensalidade vence todo mês.
+        </p>
+      </div>
       {estado?.erro && (
         <p className="text-sm text-destructive">{estado.erro}</p>
       )}

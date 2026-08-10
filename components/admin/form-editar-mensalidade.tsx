@@ -65,7 +65,6 @@ export function FormEditarMensalidade({
           <SelectContent>
             <SelectItem value="pendente">Pendente</SelectItem>
             <SelectItem value="pago">Pago</SelectItem>
-            <SelectItem value="vencido">Vencido</SelectItem>
             <SelectItem value="cancelado">Cancelado</SelectItem>
           </SelectContent>
         </Select>

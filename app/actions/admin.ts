@@ -8,6 +8,17 @@ import type { Modalidade, StatusMensalidade } from "@/lib/types/database";
 
 export type EstadoAdmin = { erro?: string; sucesso?: boolean } | undefined;
 
+function parseDiaVencimento(formData: FormData): { valor?: number | null; erro?: string } {
+  const bruto = String(formData.get("dia_vencimento") ?? "").trim();
+  if (!bruto) return { valor: null };
+
+  const numero = Number(bruto);
+  if (!Number.isInteger(numero) || numero < 1 || numero > 28) {
+    return { erro: "Dia de vencimento deve ser um número entre 1 e 28." };
+  }
+  return { valor: numero };
+}
+
 export async function criarAlunaAdmin(
   _estado: EstadoAdmin,
   formData: FormData
@@ -28,6 +39,9 @@ export async function criarAlunaAdmin(
   if (senha.length < 6) {
     return { erro: "A senha deve ter pelo menos 6 caracteres." };
   }
+
+  const { valor: diaVencimento, erro: erroDiaVencimento } = parseDiaVencimento(formData);
+  if (erroDiaVencimento) return { erro: erroDiaVencimento };
 
   const admin = createAdminClient();
 
@@ -56,6 +70,7 @@ export async function criarAlunaAdmin(
       telefone,
       data_nascimento: dataNascimento,
       modalidade,
+      dia_vencimento: diaVencimento,
     })
     .eq("id", usuarioCriado.user.id);
 
@@ -73,6 +88,10 @@ export async function atualizarAlunaAdmin(
   formData: FormData
 ): Promise<EstadoAdmin> {
   await requireAdmin();
+
+  const { valor: diaVencimento, erro: erroDiaVencimento } = parseDiaVencimento(formData);
+  if (erroDiaVencimento) return { erro: erroDiaVencimento };
+
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -83,6 +102,7 @@ export async function atualizarAlunaAdmin(
       data_nascimento: String(formData.get("data_nascimento") ?? "") || null,
       modalidade: (String(formData.get("modalidade") ?? "") ||
         null) as Modalidade | null,
+      dia_vencimento: diaVencimento,
     })
     .eq("id", alunaId);
 

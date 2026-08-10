@@ -11,6 +11,7 @@ export interface Profile {
   modalidade: Modalidade | null;
   foto_antes_url: string | null;
   foto_atual_url: string | null;
+  dia_vencimento: number | null;
   criado_em: string;
   atualizado_em: string;
 }
