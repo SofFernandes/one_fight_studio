@@ -9,13 +9,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function LoginPage() {
   const [estado, action, pending] = useActionState(login, undefined);
   const [mostrarSenha, setMostrarSenha] = useState(false);
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-background px-4 py-10">
+    <div className="relative flex min-h-dvh items-center justify-center bg-background px-4 py-10">
+      <div className="absolute right-4 top-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-sm">
         <Card className="rounded-3xl border-border/60 shadow-xl shadow-black/30">
           <div className="flex flex-col items-center gap-8 text-center">
@@ -28,8 +32,8 @@ export default function LoginPage() {
               className="rounded-3xl shadow-lg shadow-black/40"
             />
             <div>
-              <h1 className="text-lg font-semibold tracking-wide text-foreground">
-                ONE FIGHT STUDIO
+              <h1 className="font-heading text-2xl font-semibold tracking-wide text-primary">
+                One Fight Studio
               </h1>
               <p className="text-sm text-muted-foreground">
                 Entre com seu e-mail e senha

@@ -1,14 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
 import { requireAdmin } from "@/lib/dal";
 import { logout } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
-
-const LINKS = [
-  { href: "/admin/dashboard", label: "Dashboard" },
-  { href: "/admin/alunas", label: "Alunas" },
-  { href: "/admin/planos", label: "Planos" },
-];
+import { ThemeToggle } from "@/components/theme-toggle";
+import { NavLinks } from "@/components/admin/nav-links";
 
 export default async function Navbar() {
   await requireAdmin();
@@ -24,27 +19,20 @@ export default async function Navbar() {
             height={36}
             className="rounded-xl"
           />
-          <span className="hidden text-sm font-semibold tracking-wide sm:inline">
-            ONE FIGHT STUDIO — ADMIN
+          <span className="hidden font-heading text-lg font-semibold tracking-wide text-primary sm:inline">
+            One Fight Studio — Admin
           </span>
         </div>
-        <form action={logout}>
-          <Button variant="ghost" size="sm" type="submit" className="rounded-xl">
-            Sair
-          </Button>
-        </form>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <form action={logout}>
+            <Button variant="ghost" size="lg" type="submit" className="rounded-xl">
+              Sair
+            </Button>
+          </form>
+        </div>
       </div>
-      <nav className="mx-auto flex max-w-5xl gap-1 px-4 pb-2 sm:px-6">
-        {LINKS.map(({ href, label }) => (
-          <Link
-            key={href}
-            href={href}
-            className="rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          >
-            {label}
-          </Link>
-        ))}
-      </nav>
+      <NavLinks />
     </header>
   );
 }

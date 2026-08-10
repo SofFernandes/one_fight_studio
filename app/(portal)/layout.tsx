@@ -2,6 +2,7 @@ import Image from "next/image";
 import { requireAluna } from "@/lib/dal";
 import { logout } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function PortalLayout({
   children,
@@ -23,14 +24,15 @@ export default async function PortalLayout({
               height={36}
               className="rounded-xl"
             />
-            <span className="hidden text-sm font-semibold tracking-wide sm:inline">
-              ONE FIGHT STUDIO
+            <span className="hidden font-heading text-lg font-semibold tracking-wide text-primary sm:inline">
+              One Fight Studio
             </span>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="max-w-[8rem] truncate text-sm text-muted-foreground sm:max-w-none">
               {primeiroNome}
             </span>
+            <ThemeToggle />
             <form action={logout}>
               <Button variant="ghost" size="sm" type="submit" className="rounded-xl">
                 Sair
