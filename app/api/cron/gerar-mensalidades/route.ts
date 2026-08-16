@@ -1,7 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPlanoVigente } from "@/lib/planos";
-import type { Modalidade } from "@/lib/types/database";
+import { getPlanosVigentesDaAluna } from "@/lib/planos";
 
 export const dynamic = "force-dynamic";
 
@@ -31,10 +30,9 @@ export async function GET(request: NextRequest) {
 
   const { data: candidatas, error: erroCandidatas } = await admin
     .from("profiles")
-    .select("id, modalidade")
+    .select("id")
     .eq("papel", "aluna")
-    .eq("dia_vencimento", diaDoMes)
-    .not("modalidade", "is", null);
+    .eq("dia_vencimento", diaDoMes);
 
   if (erroCandidatas) {
     console.error("[cron gerar-mensalidades] erro ao buscar candidatas:", erroCandidatas);
@@ -45,34 +43,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ processadas: 0, competencia, dia: diaDoMes });
   }
 
-  const modalidadesUnicas = Array.from(
-    new Set(candidatas.map((c) => c.modalidade as Modalidade))
-  );
-
-  const planoPorModalidade = new Map<Modalidade, { id: string; valor_centavos: number }>();
-  for (const modalidade of modalidadesUnicas) {
-    const plano = await getPlanoVigente(admin, modalidade);
-    if (plano) {
-      planoPorModalidade.set(modalidade, plano);
-    } else {
-      console.warn(`[cron gerar-mensalidades] sem plano vigente para modalidade "${modalidade}", pulando.`);
+  const linhas = [];
+  for (const aluna of candidatas) {
+    const planos = await getPlanosVigentesDaAluna(admin, aluna.id);
+    if (planos.length === 0) {
+      console.warn(`[cron gerar-mensalidades] aluna ${aluna.id} sem plano vigente vinculado, pulando.`);
+      continue;
     }
-  }
 
-  const linhas = candidatas
-    .map((aluna) => {
-      const plano = planoPorModalidade.get(aluna.modalidade as Modalidade);
-      if (!plano) return null;
-      return {
-        aluna_id: aluna.id,
-        plano_id: plano.id,
-        competencia,
-        valor_centavos: plano.valor_centavos,
-        vencimento,
-        status: "pendente" as const,
-      };
-    })
-    .filter((linha): linha is NonNullable<typeof linha> => linha !== null);
+    const valorTotalCentavos = planos.reduce((soma, p) => soma + p.valor_centavos, 0);
+
+    linhas.push({
+      aluna_id: aluna.id,
+      plano_id: planos.length === 1 ? planos[0].id : null,
+      competencia,
+      valor_centavos: valorTotalCentavos,
+      vencimento,
+      status: "pendente" as const,
+    });
+  }
 
   if (linhas.length === 0) {
     return NextResponse.json({ processadas: 0, competencia, dia: diaDoMes });

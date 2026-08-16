@@ -5,33 +5,23 @@ import { ajustarValorPlano } from "@/app/actions/planos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Modalidade, Plano } from "@/lib/types/database";
+import type { Plano } from "@/lib/types/database";
 
-export function FormPlano({
-  modalidade,
-  nome,
-  planoAtual,
-}: {
-  modalidade: Modalidade;
-  nome: string;
-  planoAtual: Plano | null;
-}) {
-  const acaoComContexto = ajustarValorPlano.bind(null, modalidade, nome);
-  const [estado, action, pending] = useActionState(acaoComContexto, undefined);
+export function FormPlano({ plano }: { plano: Plano }) {
+  const acaoComId = ajustarValorPlano.bind(null, plano.id);
+  const [estado, action, pending] = useActionState(acaoComId, undefined);
 
   return (
     <form action={action} className="flex flex-col gap-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="flex flex-1 flex-col gap-2">
-          <Label htmlFor={`valor-${modalidade}`}>Valor (R$)</Label>
+          <Label htmlFor={`valor-${plano.id}`}>{plano.nome} — Valor (R$)</Label>
           <Input
-            key={planoAtual?.id ?? "novo"}
-            id={`valor-${modalidade}`}
+            key={plano.id}
+            id={`valor-${plano.id}`}
             name="valor"
             type="text"
-            defaultValue={
-              planoAtual ? (planoAtual.valor_centavos / 100).toFixed(2) : ""
-            }
+            defaultValue={(plano.valor_centavos / 100).toFixed(2)}
             placeholder="0,00"
             className="h-11 rounded-xl"
             required

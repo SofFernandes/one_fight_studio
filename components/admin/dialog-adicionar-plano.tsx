@@ -2,7 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { Plus } from "lucide-react";
-import { criarAlunaAdmin } from "@/app/actions/admin";
+import { criarPlanoAdmin } from "@/app/actions/planos";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,14 +20,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { SeletorPlanosAluna } from "@/components/admin/seletor-planos-aluna";
-import type { Plano } from "@/lib/types/database";
 
-export function DialogAdicionarAluna({
-  planosDisponiveis,
-}: {
-  planosDisponiveis: Plano[];
-}) {
+export function DialogAdicionarPlano() {
   const [aberto, setAberto] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -36,7 +30,7 @@ export function DialogAdicionarAluna({
   function handleSubmit(formData: FormData) {
     setErro(null);
     startTransition(async () => {
-      const resultado = await criarAlunaAdmin(undefined, formData);
+      const resultado = await criarPlanoAdmin(undefined, formData);
       if (resultado?.erro) {
         setErro(resultado.erro);
         return;
@@ -56,74 +50,32 @@ export function DialogAdicionarAluna({
     >
       <DialogTrigger render={<Button className="rounded-xl font-semibold" />}>
         <Plus className="size-4" />
-        Adicionar aluna
+        Adicionar plano
       </DialogTrigger>
       <DialogContent className="rounded-3xl sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Nova aluna</DialogTitle>
+          <DialogTitle>Novo plano</DialogTitle>
         </DialogHeader>
         <form ref={formRef} action={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="nome_completo">Nome completo</Label>
+            <Label htmlFor="nome">Nome do plano</Label>
             <Input
-              id="nome_completo"
-              name="nome_completo"
+              id="nome"
+              name="nome"
+              placeholder="ex: Personal 2x/semana"
               className="h-11 rounded-xl"
               required
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="email">E-mail</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              className="h-11 rounded-xl"
-              required
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="senha">Senha temporária</Label>
-            <Input
-              id="senha"
-              name="senha"
-              type="text"
-              placeholder="mínimo 6 caracteres"
-              className="h-11 rounded-xl"
-              required
-              minLength={6}
-            />
-            <p className="text-xs text-muted-foreground">
-              Informe essa senha para a aluna pessoalmente.
-            </p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="telefone">Telefone (WhatsApp)</Label>
-            <Input
-              id="telefone"
-              name="telefone"
-              placeholder="+5511999999999"
-              className="h-11 rounded-xl"
-            />
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="data_nascimento">Data de nascimento</Label>
-            <Input
-              id="data_nascimento"
-              name="data_nascimento"
-              type="date"
-              className="h-11 rounded-xl"
-            />
-          </div>
-          <div className="flex gap-2">
             <Label htmlFor="modalidade">Modalidade</Label>
-            <Select name="modalidade">
+            <Select name="modalidade" required>
               <SelectTrigger id="modalidade" className="h-11 rounded-xl">
                 <SelectValue placeholder="Selecione" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="personal">Personal</SelectItem>
-                <SelectItem value="grupo">Aulas Coletivas</SelectItem>
+                <SelectItem value="grupo">Aula em grupo</SelectItem>
                 <SelectItem value="totalpass_wellhub">
                   Check-in (TotalPass/Wellhub)
                 </SelectItem>
@@ -131,28 +83,23 @@ export function DialogAdicionarAluna({
             </Select>
           </div>
           <div className="flex flex-col gap-2">
-            <Label htmlFor="dia_vencimento">Dia de vencimento (1-28)</Label>
+            <Label htmlFor="valor">Valor (R$)</Label>
             <Input
-              id="dia_vencimento"
-              name="dia_vencimento"
-              type="number"
-              min={1}
-              max={28}
-              placeholder="ex: 10"
+              id="valor"
+              name="valor"
+              type="text"
+              placeholder="0,00"
               className="h-11 rounded-xl"
+              required
             />
           </div>
-          <SeletorPlanosAluna
-            planosDisponiveis={planosDisponiveis}
-            planosVinculadosIds={[]}
-          />
           {erro && <p className="text-sm text-destructive">{erro}</p>}
           <Button
             type="submit"
             disabled={pending}
             className="h-11 rounded-xl font-semibold"
           >
-            {pending ? "Criando..." : "Criar aluna"}
+            {pending ? "Criando..." : "Criar plano"}
           </Button>
         </form>
       </DialogContent>

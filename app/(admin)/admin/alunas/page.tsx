@@ -21,6 +21,7 @@ import {
   rotuloStatusDerivado,
   variantStatusDerivado,
 } from "@/lib/mensalidades";
+import { getPlanosVigentes } from "@/lib/planos";
 import type { Mensalidade, Profile } from "@/lib/types/database";
 
 function competenciaAtual() {
@@ -38,19 +39,21 @@ export default async function AdminAlunasPage() {
   const supabase = await createClient();
   const competencia = competenciaAtual();
 
-  const [{ data: alunas }, { data: mensalidades }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("*")
-      .eq("papel", "aluna")
-      .order("nome_completo")
-      .returns<Profile[]>(),
-    supabase
-      .from("mensalidades")
-      .select("*")
-      .eq("competencia", competencia)
-      .returns<Mensalidade[]>(),
-  ]);
+  const [{ data: alunas }, { data: mensalidades }, planosDisponiveis] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("*")
+        .eq("papel", "aluna")
+        .order("nome_completo")
+        .returns<Profile[]>(),
+      supabase
+        .from("mensalidades")
+        .select("*")
+        .eq("competencia", competencia)
+        .returns<Mensalidade[]>(),
+      getPlanosVigentes(supabase),
+    ]);
 
   const mensalidadePorAluna = new Map(
     (mensalidades ?? []).map((m) => [m.aluna_id, m])
@@ -60,7 +63,7 @@ export default async function AdminAlunasPage() {
     <Card className="rounded-2xl">
       <CardHeader className="flex flex-row items-center justify-between gap-3">
         <CardTitle>Alunas</CardTitle>
-        <DialogAdicionarAluna />
+        <DialogAdicionarAluna planosDisponiveis={planosDisponiveis} />
       </CardHeader>
       <CardContent className="overflow-x-auto">
         <Table>

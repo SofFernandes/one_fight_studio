@@ -26,6 +26,12 @@ export interface Plano {
   criado_em: string;
 }
 
+export interface AlunaPlano {
+  aluna_id: string;
+  plano_id: string;
+  criado_em: string;
+}
+
 export interface Mensalidade {
   id: string;
   aluna_id: string;

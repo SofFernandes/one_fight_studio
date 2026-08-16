@@ -12,9 +12,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Profile } from "@/lib/types/database";
+import { SeletorPlanosAluna } from "@/components/admin/seletor-planos-aluna";
+import type { Plano, Profile } from "@/lib/types/database";
 
-export function FormEditarAluna({ profile }: { profile: Profile }) {
+export function FormEditarAluna({
+  profile,
+  planosDisponiveis,
+  planosVinculadosIds,
+}: {
+  profile: Profile;
+  planosDisponiveis: Plano[];
+  planosVinculadosIds: string[];
+}) {
   const acaoComId = atualizarAlunaAdmin.bind(null, profile.id);
   const [estado, action, pending] = useActionState(acaoComId, undefined);
 
@@ -85,6 +94,10 @@ export function FormEditarAluna({ profile }: { profile: Profile }) {
           Dia fixo em que a mensalidade vence todo mês.
         </p>
       </div>
+      <SeletorPlanosAluna
+        planosDisponiveis={planosDisponiveis}
+        planosVinculadosIds={planosVinculadosIds}
+      />
       {estado?.erro && (
         <p className="text-sm text-destructive">{estado.erro}</p>
       )}

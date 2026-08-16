@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/dal";
@@ -17,6 +18,47 @@ function parseDiaVencimento(formData: FormData): { valor?: number | null; erro?:
     return { erro: "Dia de vencimento deve ser um número entre 1 e 28." };
   }
   return { valor: numero };
+}
+
+// Sincroniza aluna_planos com os plano_id marcados no form (chips), fazendo
+// diff contra o que já existe: insere os novos, remove os desmarcados.
+async function sincronizarPlanosDaAluna(
+  supabase: SupabaseClient,
+  alunaId: string,
+  formData: FormData
+): Promise<{ erro?: string }> {
+  const planosMarcados = formData.getAll("planos").map(String);
+
+  const { data: vinculosAtuais, error: erroBusca } = await supabase
+    .from("aluna_planos")
+    .select("plano_id")
+    .eq("aluna_id", alunaId);
+
+  if (erroBusca) return { erro: "Não foi possível ler os planos vinculados." };
+
+  const idsAtuais = new Set((vinculosAtuais ?? []).map((v) => v.plano_id as string));
+  const idsMarcados = new Set(planosMarcados);
+
+  const paraInserir = planosMarcados.filter((id) => !idsAtuais.has(id));
+  const paraRemover = [...idsAtuais].filter((id) => !idsMarcados.has(id));
+
+  if (paraInserir.length > 0) {
+    const { error } = await supabase
+      .from("aluna_planos")
+      .insert(paraInserir.map((planoId) => ({ aluna_id: alunaId, plano_id: planoId })));
+    if (error) return { erro: "Não foi possível vincular os planos selecionados." };
+  }
+
+  if (paraRemover.length > 0) {
+    const { error } = await supabase
+      .from("aluna_planos")
+      .delete()
+      .eq("aluna_id", alunaId)
+      .in("plano_id", paraRemover);
+    if (error) return { erro: "Não foi possível desvincular os planos removidos." };
+  }
+
+  return {};
 }
 
 export async function criarAlunaAdmin(
@@ -78,6 +120,13 @@ export async function criarAlunaAdmin(
     return { erro: "Conta criada, mas houve erro ao salvar os dados extras." };
   }
 
+  const { erro: erroPlanos } = await sincronizarPlanosDaAluna(
+    admin,
+    usuarioCriado.user.id,
+    formData
+  );
+  if (erroPlanos) return { erro: erroPlanos };
+
   revalidatePath("/admin/alunas");
   return { sucesso: true };
 }
@@ -107,6 +156,13 @@ export async function atualizarAlunaAdmin(
     .eq("id", alunaId);
 
   if (error) return { erro: "Não foi possível salvar." };
+
+  const { erro: erroPlanos } = await sincronizarPlanosDaAluna(
+    supabase,
+    alunaId,
+    formData
+  );
+  if (erroPlanos) return { erro: erroPlanos };
 
   revalidatePath(`/admin/alunas/${alunaId}`);
   revalidatePath("/admin/alunas");

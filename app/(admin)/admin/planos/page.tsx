@@ -6,40 +6,52 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { FormPlano } from "@/components/admin/form-plano";
-import type { Modalidade, Plano } from "@/lib/types/database";
+import { DialogAdicionarPlano } from "@/components/admin/dialog-adicionar-plano";
+import { getPlanosVigentes } from "@/lib/planos";
+import type { Modalidade } from "@/lib/types/database";
 
-const PLANOS_CONFIGURAVEIS: { modalidade: Modalidade; nome: string; titulo: string }[] = [
-  { modalidade: "personal", nome: "Personal", titulo: "Personal" },
-  { modalidade: "grupo", nome: "Aula em grupo", titulo: "Aula em grupo" },
-];
+const ROTULO_MODALIDADE: Record<Modalidade, string> = {
+  personal: "Personal",
+  grupo: "Aula em grupo",
+  totalpass_wellhub: "Check-in (TotalPass/Wellhub)",
+};
 
 export default async function AdminPlanosPage() {
   const supabase = await createClient();
+  const planosVigentes = await getPlanosVigentes(supabase);
 
-  const { data: planosVigentes } = await supabase
-    .from("planos")
-    .select("*")
-    .is("vigencia_fim", null)
-    .returns<Plano[]>();
-
-  const planoPorModalidade = new Map(
-    (planosVigentes ?? []).map((p) => [p.modalidade, p])
-  );
+  const planosPorModalidade = new Map<Modalidade, typeof planosVigentes>();
+  for (const plano of planosVigentes) {
+    const grupo = planosPorModalidade.get(plano.modalidade) ?? [];
+    grupo.push(plano);
+    planosPorModalidade.set(plano.modalidade, grupo);
+  }
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-xl font-semibold">Planos e valores</h1>
-      {PLANOS_CONFIGURAVEIS.map(({ modalidade, nome, titulo }) => (
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl font-semibold">Planos e valores</h1>
+        <DialogAdicionarPlano />
+      </div>
+
+      {planosVigentes.length === 0 && (
+        <Card className="rounded-2xl">
+          <CardContent className="py-8 text-center text-sm text-muted-foreground">
+            Nenhum plano cadastrado ainda. Clique em &ldquo;Adicionar plano&rdquo;
+            para criar o primeiro.
+          </CardContent>
+        </Card>
+      )}
+
+      {[...planosPorModalidade.entries()].map(([modalidade, planos]) => (
         <Card key={modalidade} className="rounded-2xl">
           <CardHeader>
-            <CardTitle>{titulo}</CardTitle>
+            <CardTitle>{ROTULO_MODALIDADE[modalidade]}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <FormPlano
-              modalidade={modalidade}
-              nome={nome}
-              planoAtual={planoPorModalidade.get(modalidade) ?? null}
-            />
+          <CardContent className="flex flex-col gap-6">
+            {planos.map((plano) => (
+              <FormPlano key={plano.id} plano={plano} />
+            ))}
           </CardContent>
         </Card>
       ))}

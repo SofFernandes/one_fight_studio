@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { FormEditarAluna } from "@/components/admin/form-editar-aluna";
 import { FormEditarMensalidade } from "@/components/admin/form-editar-mensalidade";
+import { getPlanosVigentes, getPlanosVigentesDaAluna } from "@/lib/planos";
 import type { Mensalidade, Profile } from "@/lib/types/database";
 
 function competenciaAtual() {
@@ -31,12 +32,17 @@ export default async function EditarAlunaPage({
 
   if (!aluna) notFound();
 
-  const { data: mensalidade } = await supabase
-    .from("mensalidades")
-    .select("*")
-    .eq("aluna_id", id)
-    .eq("competencia", competenciaAtual())
-    .maybeSingle<Mensalidade>();
+  const [{ data: mensalidade }, planosDisponiveis, planosVinculados] =
+    await Promise.all([
+      supabase
+        .from("mensalidades")
+        .select("*")
+        .eq("aluna_id", id)
+        .eq("competencia", competenciaAtual())
+        .maybeSingle<Mensalidade>(),
+      getPlanosVigentes(supabase),
+      getPlanosVigentesDaAluna(supabase, id),
+    ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -47,7 +53,11 @@ export default async function EditarAlunaPage({
           <CardTitle>Dados pessoais</CardTitle>
         </CardHeader>
         <CardContent>
-          <FormEditarAluna profile={aluna} />
+          <FormEditarAluna
+            profile={aluna}
+            planosDisponiveis={planosDisponiveis}
+            planosVinculadosIds={planosVinculados.map((p) => p.id)}
+          />
         </CardContent>
       </Card>
 
