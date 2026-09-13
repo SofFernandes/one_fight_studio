@@ -7,13 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -58,7 +51,7 @@ export function DialogAdicionarAluna({
         <Plus className="size-4" />
         Adicionar aluna
       </DialogTrigger>
-      <DialogContent className="rounded-3xl sm:max-w-md">
+      <DialogContent className="max-h-[85vh] overflow-y-auto rounded-3xl sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Nova aluna</DialogTitle>
         </DialogHeader>
@@ -114,21 +107,6 @@ export function DialogAdicionarAluna({
               type="date"
               className="h-11 rounded-xl"
             />
-          </div>
-          <div className="flex gap-2">
-            <Label htmlFor="modalidade">Modalidade</Label>
-            <Select name="modalidade">
-              <SelectTrigger id="modalidade" className="h-11 rounded-xl">
-                <SelectValue placeholder="Selecione" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="personal">Personal</SelectItem>
-                <SelectItem value="grupo">Aulas Coletivas</SelectItem>
-                <SelectItem value="totalpass_wellhub">
-                  Check-in (TotalPass/Wellhub)
-                </SelectItem>
-              </SelectContent>
-            </Select>
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="dia_vencimento">Dia de vencimento (1-28)</Label>

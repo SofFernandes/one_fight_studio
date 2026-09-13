@@ -44,6 +44,16 @@ export interface Mensalidade {
   criado_em: string;
 }
 
+export type TipoMensagem = "vencimento" | "aniversario";
+
+export interface MensagemEnviada {
+  id: string;
+  aluna_id: string;
+  tipo: TipoMensagem;
+  referencia: string;
+  enviado_em: string;
+}
+
 export interface ReceitaMensal {
   competencia: string;
   receita_paga_centavos: number;

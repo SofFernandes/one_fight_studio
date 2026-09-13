@@ -5,7 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/dal";
-import type { Modalidade, StatusMensalidade } from "@/lib/types/database";
+import type { StatusMensalidade } from "@/lib/types/database";
 
 export type EstadoAdmin = { erro?: string; sucesso?: boolean } | undefined;
 
@@ -34,7 +34,10 @@ async function sincronizarPlanosDaAluna(
     .select("plano_id")
     .eq("aluna_id", alunaId);
 
-  if (erroBusca) return { erro: "Não foi possível ler os planos vinculados." };
+  if (erroBusca) {
+    console.error("[sincronizarPlanosDaAluna] erro ao ler aluna_planos:", erroBusca);
+    return { erro: `Não foi possível ler os planos vinculados: ${erroBusca.message}` };
+  }
 
   const idsAtuais = new Set((vinculosAtuais ?? []).map((v) => v.plano_id as string));
   const idsMarcados = new Set(planosMarcados);
@@ -72,8 +75,6 @@ export async function criarAlunaAdmin(
   const nomeCompleto = String(formData.get("nome_completo") ?? "").trim();
   const telefone = String(formData.get("telefone") ?? "") || null;
   const dataNascimento = String(formData.get("data_nascimento") ?? "") || null;
-  const modalidade =
-    (String(formData.get("modalidade") ?? "") || null) as Modalidade | null;
 
   if (!email || !senha || !nomeCompleto) {
     return { erro: "Preencha e-mail, senha e nome completo." };
@@ -111,7 +112,6 @@ export async function criarAlunaAdmin(
     .update({
       telefone,
       data_nascimento: dataNascimento,
-      modalidade,
       dia_vencimento: diaVencimento,
     })
     .eq("id", usuarioCriado.user.id);
@@ -149,8 +149,6 @@ export async function atualizarAlunaAdmin(
       nome_completo: String(formData.get("nome_completo") ?? ""),
       telefone: String(formData.get("telefone") ?? "") || null,
       data_nascimento: String(formData.get("data_nascimento") ?? "") || null,
-      modalidade: (String(formData.get("modalidade") ?? "") ||
-        null) as Modalidade | null,
       dia_vencimento: diaVencimento,
     })
     .eq("id", alunaId);

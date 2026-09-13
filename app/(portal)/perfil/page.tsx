@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { FormDadosPessoais } from "@/components/portal/form-dados-pessoais";
 import { UploadFoto } from "@/components/portal/upload-foto";
+import { getPlanosVigentesDaAluna } from "@/lib/planos";
 import type { Mensalidade } from "@/lib/types/database";
 
 function formatarReais(centavos: number) {
@@ -40,13 +41,16 @@ export default async function PerfilPage() {
   const profile = await requireAluna();
   const supabase = await createClient();
 
-  const { data: mensalidade } = await supabase
-    .from("mensalidades")
-    .select("*")
-    .eq("aluna_id", profile.id)
-    .order("competencia", { ascending: false })
-    .limit(1)
-    .maybeSingle<Mensalidade>();
+  const [{ data: mensalidade }, planosVinculados] = await Promise.all([
+    supabase
+      .from("mensalidades")
+      .select("*")
+      .eq("aluna_id", profile.id)
+      .order("competencia", { ascending: false })
+      .limit(1)
+      .maybeSingle<Mensalidade>(),
+    getPlanosVigentesDaAluna(supabase, profile.id),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -75,6 +79,31 @@ export default async function PerfilPage() {
           ) : (
             <p className="text-sm text-muted-foreground">
               Nenhuma mensalidade cadastrada ainda.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle>Meus planos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {planosVinculados.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {planosVinculados.map((plano) => (
+                <Badge
+                  key={plano.id}
+                  variant="secondary"
+                  className="rounded-full px-3 py-1"
+                >
+                  {plano.nome}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Nenhum plano vinculado ainda. Fale com a administração.
             </p>
           )}
         </CardContent>
