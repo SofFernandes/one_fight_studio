@@ -28,35 +28,3 @@ export async function atualizarDadosPessoais(
   revalidatePath("/perfil");
   return { sucesso: true };
 }
-
-export async function enviarFoto(
-  tipo: "antes" | "atual",
-  formData: FormData
-): Promise<EstadoPerfil> {
-  const user = await getSessionUser();
-  if (!user) return { erro: "Sessão expirada." };
-
-  const arquivo = formData.get("foto") as File | null;
-  if (!arquivo || arquivo.size === 0) return { erro: "Selecione uma foto." };
-
-  const supabase = await createClient();
-  const extensao = arquivo.name.split(".").pop() ?? "jpg";
-  const caminho = `${user.id}/${tipo}.${extensao}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from("fotos-alunas")
-    .upload(caminho, arquivo, { upsert: true });
-
-  if (uploadError) return { erro: "Falha ao enviar a foto." };
-
-  const coluna = tipo === "antes" ? "foto_antes_url" : "foto_atual_url";
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({ [coluna]: caminho })
-    .eq("id", user.id);
-
-  if (updateError) return { erro: "Falha ao salvar a foto." };
-
-  revalidatePath("/perfil");
-  return { sucesso: true };
-}
