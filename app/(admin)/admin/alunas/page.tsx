@@ -22,24 +22,18 @@ import {
   variantStatusDerivado,
 } from "@/lib/mensalidades";
 import { getPlanosVigentes } from "@/lib/planos";
-import type { Mensalidade, Profile } from "@/lib/types/database";
+import type { Mensalidade, Plano, Profile } from "@/lib/types/database";
 
 function competenciaAtual() {
   const hoje = new Date();
   return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}-01`;
 }
 
-const rotuloModalidade: Record<string, string> = {
-  personal: "Personal",
-  grupo: "Grupo",
-  totalpass_wellhub: "TotalPass/Wellhub",
-};
-
 export default async function AdminAlunasPage() {
   const supabase = await createClient();
   const competencia = competenciaAtual();
 
-  const [{ data: alunas }, { data: mensalidades }, planosDisponiveis] =
+  const [{ data: alunas }, { data: mensalidades }, planosDisponiveis, { data: vinculos }] =
     await Promise.all([
       supabase
         .from("profiles")
@@ -53,11 +47,21 @@ export default async function AdminAlunasPage() {
         .eq("competencia", competencia)
         .returns<Mensalidade[]>(),
       getPlanosVigentes(supabase),
+      supabase.from("aluna_planos").select("aluna_id, planos(*)"),
     ]);
 
   const mensalidadePorAluna = new Map(
     (mensalidades ?? []).map((m) => [m.aluna_id, m])
   );
+
+  const planosPorAluna = new Map<string, Plano[]>();
+  for (const vinculo of vinculos ?? []) {
+    const plano = vinculo.planos as unknown as Plano | null;
+    if (!plano) continue;
+    const grupo = planosPorAluna.get(vinculo.aluna_id) ?? [];
+    grupo.push(plano);
+    planosPorAluna.set(vinculo.aluna_id, grupo);
+  }
 
   return (
     <Card className="rounded-2xl">
@@ -70,7 +74,7 @@ export default async function AdminAlunasPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Nome</TableHead>
-              <TableHead>Modalidade</TableHead>
+              <TableHead>Planos</TableHead>
               <TableHead>Dia venc.</TableHead>
               <TableHead>Vencimento</TableHead>
               <TableHead>Status</TableHead>
@@ -83,13 +87,26 @@ export default async function AdminAlunasPage() {
               const statusDerivado = mensalidade
                 ? derivarStatus(mensalidade)
                 : null;
+              const planosDaAluna = planosPorAluna.get(aluna.id) ?? [];
               return (
                 <TableRow key={aluna.id}>
                   <TableCell>{aluna.nome_completo}</TableCell>
                   <TableCell>
-                    {aluna.modalidade
-                      ? rotuloModalidade[aluna.modalidade]
-                      : "—"}
+                    {planosDaAluna.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5">
+                        {planosDaAluna.map((plano) => (
+                          <Badge
+                            key={plano.id}
+                            variant="secondary"
+                            className="rounded-full px-2.5"
+                          >
+                            {plano.nome}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      "—"
+                    )}
                   </TableCell>
                   <TableCell>{aluna.dia_vencimento ?? "—"}</TableCell>
                   <TableCell>

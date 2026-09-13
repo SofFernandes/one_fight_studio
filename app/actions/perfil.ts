@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/dal";
-import type { Modalidade } from "@/lib/types/database";
 
 export type EstadoPerfil = { erro?: string; sucesso?: boolean } | undefined;
 
@@ -21,8 +20,6 @@ export async function atualizarDadosPessoais(
       nome_completo: String(formData.get("nome_completo") ?? ""),
       telefone: String(formData.get("telefone") ?? "") || null,
       data_nascimento: String(formData.get("data_nascimento") ?? "") || null,
-      modalidade: (String(formData.get("modalidade") ?? "") ||
-        null) as Modalidade | null,
     })
     .eq("id", user.id);
 

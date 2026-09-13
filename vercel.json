@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/gerar-mensalidades",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/enviar-whatsapp",
+      "schedule": "0 12 * * *"
     }
   ]
 }

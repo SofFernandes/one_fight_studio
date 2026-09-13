@@ -8,7 +8,7 @@ consulta de mensalidade, e dashboard de admin com receita mensal e alunas ativas
 - **Next.js 16** (App Router) + **Vercel** (hosting)
 - **Supabase** (Postgres + Auth + Storage)
 - **Tailwind + shadcn/ui**
-- WhatsApp Cloud API (fase 2 — mensageria de vencimento/aniversário)
+- **WhatsApp Cloud API** (Meta) — aviso de mensalidade atrasada e parabéns de aniversário
 
 ## Setup local
 
@@ -21,6 +21,7 @@ consulta de mensalidade, e dashboard de admin com receita mensal e alunas ativas
    - `supabase/migrations/0005_status_vencido_deprecated.sql`
    - `supabase/migrations/0006_grants_service_role.sql`
    - `supabase/migrations/0007_aluna_planos.sql`
+   - `supabase/migrations/0008_tipo_mensagem_comment.sql`
 3. Copie `.env.example` para `.env.local` e preencha com as chaves de
    **Project Settings > API** do seu projeto Supabase, e gere um `CRON_SECRET`
    com `openssl rand -hex 32`.
@@ -52,6 +53,9 @@ O UUID aparece em **Authentication > Users** no painel do Supabase.
 - `app/actions` — Server Actions (auth, perfil, admin, planos)
 - `app/api/cron/gerar-mensalidades` — cron diário que gera a mensalidade do mês de cada
   aluna no seu dia de vencimento fixo (`profiles.dia_vencimento`)
+- `app/api/cron/enviar-whatsapp` — cron diário que avisa mensalidade atrasada e
+  parabeniza aniversariantes via WhatsApp Cloud API
+- `lib/whatsapp.ts` — encapsula a chamada à WhatsApp Cloud API (envio de template)
 - `lib/supabase` — clientes Supabase (browser, server, proxy/sessão, admin/service role)
 - `lib/dal.ts` — Data Access Layer: única fonte de verdade sobre quem está logado e qual o papel
 - `lib/mensalidades.ts` — deriva o status exibido (pago/a vencer/vencida) a partir de
@@ -83,7 +87,47 @@ curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/gera
 
 Em produção, o `vercel.json` já configura o Vercel Cron para rodar 1x/dia (06:00 UTC).
 
-## Próximos passos (fase 2)
+## Mensageria WhatsApp
 
-- Cron de WhatsApp: avisar mensalidade vencida e parabenizar aniversário via WhatsApp Cloud API
+O cron em `/api/cron/enviar-whatsapp` roda 1x/dia (12:00 UTC = 9h Brasília) e:
+
+- Avisa toda aluna com mensalidade `pendente` e `vencimento` no passado (mesmo critério
+  de "vencida" usado em `lib/mensalidades.ts`), 1x por dia enquanto continuar em aberto.
+- Parabeniza quem faz aniversário no dia (compara mês/dia de `data_nascimento`).
+
+Cada envio é idempotente via a tabela `mensagens_enviadas` — não duplica no mesmo dia
+mesmo se o cron rodar mais de uma vez. Alunas sem `telefone` cadastrado são puladas.
+
+### Configurar a WhatsApp Cloud API (Meta)
+
+1. Crie um app em [developers.facebook.com](https://developers.facebook.com) (produto
+   "WhatsApp"), verifique um número comercial e copie `WHATSAPP_PHONE_NUMBER_ID` e
+   `WHATSAPP_ACCESS_TOKEN` (**API Setup** do produto WhatsApp).
+2. No **WhatsApp Manager**, crie 2 templates (categoria **Utility** — evite linguagem
+   promocional para facilitar a aprovação):
+
+   **Vencimento** (ex: nome `mensalidade_atrasada`):
+   > Olá {{1}}! Notamos que sua mensalidade da One Fight Studio no valor de {{2}}
+   > está em aberto desde {{3}}. Para regularizar, entre em contato com a
+   > administração. Qualquer dúvida, estamos à disposição! 🥊
+
+   **Aniversário** (ex: nome `feliz_aniversario`):
+   > Parabéns, {{1}}! 🎉 A equipe da One Fight Studio deseja a você um dia
+   > incrível e um ano cheio de conquistas dentro e fora do tatame. 🥊🎂
+
+3. Depois de aprovados (a Meta notifica por e-mail), preencha no `.env.local`:
+   `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_ACCESS_TOKEN`, `WHATSAPP_TEMPLATE_VENCIMENTO`
+   e `WHATSAPP_TEMPLATE_ANIVERSARIO` com os nomes exatos aprovados.
+
+Sem essas variáveis configuradas, o cron responde 200 com aviso de "não configurado" em
+vez de falhar — o restante do app funciona normalmente enquanto isso.
+
+Para testar manualmente:
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/enviar-whatsapp
+```
+
+## Próximos passos
+
 - Filtros/busca na listagem de alunas do admin

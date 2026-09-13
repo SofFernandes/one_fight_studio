@@ -5,13 +5,6 @@ import { atualizarDadosPessoais } from "@/app/actions/perfil";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { Profile } from "@/lib/types/database";
 
 export function FormDadosPessoais({ profile }: { profile: Profile }) {
@@ -55,21 +48,6 @@ export function FormDadosPessoais({ profile }: { profile: Profile }) {
           defaultValue={profile.data_nascimento ?? ""}
           className="h-11 rounded-xl"
         />
-      </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="modalidade">Modalidade</Label>
-        <Select name="modalidade" defaultValue={profile.modalidade ?? ""}>
-          <SelectTrigger id="modalidade" className="h-11 rounded-xl">
-            <SelectValue placeholder="Selecione" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="personal">Personal</SelectItem>
-            <SelectItem value="grupo">Aula em grupo</SelectItem>
-            <SelectItem value="totalpass_wellhub">
-              Check-in (TotalPass/Wellhub)
-            </SelectItem>
-          </SelectContent>
-        </Select>
       </div>
       {estado?.erro && (
         <p className="text-sm text-destructive">{estado.erro}</p>
