@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/admin/dashboard", label: "Dashboard" },
   { href: "/admin/alunas", label: "Alunas" },
   { href: "/admin/planos", label: "Planos" },
+  { href: "/admin/configuracoes", label: "Configurações" },
 ];
 
 export function NavLinks() {

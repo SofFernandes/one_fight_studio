@@ -19,13 +19,13 @@ export default async function PortalLayout({
           <div className="flex items-center gap-2.5">
             <Image
               src="/one_fight_logo.jpg"
-              alt="One Fight Studio"
+              alt="One Studio Fight"
               width={36}
               height={36}
               className="rounded-xl"
             />
             <span className="hidden font-heading text-lg font-semibold tracking-wide text-primary sm:inline">
-              One Fight Studio
+              One Studio Fight
             </span>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
