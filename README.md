@@ -1,7 +1,8 @@
 # One Fight Studio — Portal de Alunas
 
-Portal para academia de luta: login de alunas, dados pessoais, fotos antes/atual,
-consulta de mensalidade, e dashboard de admin com receita mensal e alunas ativas.
+Portal para academia de luta: login de alunas, dados pessoais, linha do tempo de
+progresso (foto + peso + altura), consulta de mensalidade, e dashboard de admin com
+receita mensal e alunas ativas.
 
 ## Stack
 
@@ -21,6 +22,7 @@ consulta de mensalidade, e dashboard de admin com receita mensal e alunas ativas
    - `supabase/migrations/0005_status_vencido_deprecated.sql`
    - `supabase/migrations/0006_grants_service_role.sql`
    - `supabase/migrations/0007_aluna_planos.sql`
+   - `supabase/migrations/0009_registros_progresso.sql`
 3. Copie `.env.example` para `.env.local` e preencha com as chaves de
    **Project Settings > API** do seu projeto Supabase, e gere um `CRON_SECRET`
    com `openssl rand -hex 32`.
@@ -47,7 +49,7 @@ O UUID aparece em **Authentication > Users** no painel do Supabase.
 ## Estrutura
 
 - `app/login` — tela de login
-- `app/(portal)` — área da aluna (perfil, fotos, mensalidade) — protegida por `requireAluna()`
+- `app/(portal)` — área da aluna (perfil, progresso, mensalidade) — protegida por `requireAluna()`
 - `app/(admin)` — dashboard admin (alunas, planos) — protegida por `requireAdmin()`
 - `app/actions` — Server Actions (auth, perfil, admin, planos)
 - `app/api/cron/gerar-mensalidades` — cron diário que gera a mensalidade do mês de cada

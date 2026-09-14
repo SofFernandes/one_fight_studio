@@ -20,6 +20,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import type { Modalidade } from "@/lib/types/database";
+
+const ROTULO_MODALIDADE: Record<Modalidade, string> = {
+  personal: "Personal",
+  grupo: "Aula em grupo",
+  totalpass_wellhub: "Check-in (TotalPass/Wellhub)",
+};
 
 export function DialogAdicionarPlano() {
   const [aberto, setAberto] = useState(false);
@@ -71,7 +78,11 @@ export function DialogAdicionarPlano() {
             <Label htmlFor="modalidade">Modalidade</Label>
             <Select name="modalidade" required>
               <SelectTrigger id="modalidade" className="h-11 rounded-xl">
-                <SelectValue placeholder="Selecione" />
+                <SelectValue placeholder="Selecione">
+                  {(valor: Modalidade | null) =>
+                    valor ? ROTULO_MODALIDADE[valor] : "Selecione"
+                  }
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="personal">Personal</SelectItem>

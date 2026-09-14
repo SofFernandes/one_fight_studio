@@ -5,13 +5,6 @@ import { atualizarAlunaAdmin } from "@/app/actions/admin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { SeletorPlanosAluna } from "@/components/admin/seletor-planos-aluna";
 import type { Plano, Profile } from "@/lib/types/database";
 
@@ -62,21 +55,6 @@ export function FormEditarAluna({
           defaultValue={profile.data_nascimento ?? ""}
           className="h-11 rounded-xl"
         />
-      </div>
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="modalidade">Modalidade</Label>
-        <Select name="modalidade" defaultValue={profile.modalidade ?? ""}>
-          <SelectTrigger id="modalidade" className="h-11 rounded-xl">
-            <SelectValue placeholder="Selecione" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="personal">Personal</SelectItem>
-            <SelectItem value="grupo">Aula em grupo</SelectItem>
-            <SelectItem value="totalpass_wellhub">
-              Check-in (TotalPass/Wellhub)
-            </SelectItem>
-          </SelectContent>
-        </Select>
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="dia_vencimento">Dia de vencimento (1-28)</Label>

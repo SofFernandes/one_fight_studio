@@ -8,8 +8,10 @@ import {
 } from "@/components/ui/card";
 import { FormEditarAluna } from "@/components/admin/form-editar-aluna";
 import { FormEditarMensalidade } from "@/components/admin/form-editar-mensalidade";
+import { LinhaTempoProgresso } from "@/components/portal/linha-tempo-progresso";
 import { getPlanosVigentes, getPlanosVigentesDaAluna } from "@/lib/planos";
-import type { Mensalidade, Profile } from "@/lib/types/database";
+import { getUrlAssinadaFoto } from "@/lib/storage";
+import type { Mensalidade, Profile, RegistroProgresso } from "@/lib/types/database";
 
 function competenciaAtual() {
   const hoje = new Date();
@@ -32,7 +34,7 @@ export default async function EditarAlunaPage({
 
   if (!aluna) notFound();
 
-  const [{ data: mensalidade }, planosDisponiveis, planosVinculados] =
+  const [{ data: mensalidade }, planosDisponiveis, planosVinculados, { data: registros }] =
     await Promise.all([
       supabase
         .from("mensalidades")
@@ -42,7 +44,23 @@ export default async function EditarAlunaPage({
         .maybeSingle<Mensalidade>(),
       getPlanosVigentes(supabase),
       getPlanosVigentesDaAluna(supabase, id),
+      supabase
+        .from("registros_progresso")
+        .select("*")
+        .eq("aluna_id", id)
+        .order("data_registro", { ascending: false })
+        .order("criado_em", { ascending: false })
+        .returns<RegistroProgresso[]>(),
     ]);
+
+  const registrosComFoto = await Promise.all(
+    (registros ?? []).map(async (registro) => ({
+      ...registro,
+      urlFoto: registro.foto_url
+        ? await getUrlAssinadaFoto(supabase, registro.foto_url)
+        : null,
+    }))
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -73,6 +91,15 @@ export default async function EditarAlunaPage({
               Nenhuma mensalidade cadastrada para este mês ainda.
             </p>
           )}
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl">
+        <CardHeader>
+          <CardTitle>Progresso</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <LinhaTempoProgresso registros={registrosComFoto} />
         </CardContent>
       </Card>
     </div>

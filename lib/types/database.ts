@@ -9,8 +9,6 @@ export interface Profile {
   data_nascimento: string | null;
   papel: Papel;
   modalidade: Modalidade | null;
-  foto_antes_url: string | null;
-  foto_atual_url: string | null;
   dia_vencimento: number | null;
   criado_em: string;
   atualizado_em: string;
@@ -41,6 +39,26 @@ export interface Mensalidade {
   vencimento: string;
   pago_em: string | null;
   status: StatusMensalidade;
+  criado_em: string;
+}
+
+export type TipoMensagem = "vencimento" | "aniversario";
+
+export interface MensagemEnviada {
+  id: string;
+  aluna_id: string;
+  tipo: TipoMensagem;
+  referencia: string;
+  enviado_em: string;
+}
+
+export interface RegistroProgresso {
+  id: string;
+  aluna_id: string;
+  data_registro: string;
+  foto_url: string | null;
+  peso_kg: number | null;
+  altura_cm: number | null;
   criado_em: string;
 }
 

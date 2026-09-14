@@ -8,8 +8,11 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FormDadosPessoais } from "@/components/portal/form-dados-pessoais";
-import { UploadFoto } from "@/components/portal/upload-foto";
-import type { Mensalidade } from "@/lib/types/database";
+import { FormRegistroProgresso } from "@/components/portal/form-registro-progresso";
+import { LinhaTempoProgresso } from "@/components/portal/linha-tempo-progresso";
+import { getPlanosVigentesDaAluna } from "@/lib/planos";
+import { getUrlAssinadaFoto } from "@/lib/storage";
+import type { Mensalidade, RegistroProgresso } from "@/lib/types/database";
 
 function formatarReais(centavos: number) {
   return (centavos / 100).toLocaleString("pt-BR", {
@@ -40,13 +43,33 @@ export default async function PerfilPage() {
   const profile = await requireAluna();
   const supabase = await createClient();
 
-  const { data: mensalidade } = await supabase
-    .from("mensalidades")
-    .select("*")
-    .eq("aluna_id", profile.id)
-    .order("competencia", { ascending: false })
-    .limit(1)
-    .maybeSingle<Mensalidade>();
+  const [{ data: mensalidade }, planosVinculados, { data: registros }] =
+    await Promise.all([
+      supabase
+        .from("mensalidades")
+        .select("*")
+        .eq("aluna_id", profile.id)
+        .order("competencia", { ascending: false })
+        .limit(1)
+        .maybeSingle<Mensalidade>(),
+      getPlanosVigentesDaAluna(supabase, profile.id),
+      supabase
+        .from("registros_progresso")
+        .select("*")
+        .eq("aluna_id", profile.id)
+        .order("data_registro", { ascending: false })
+        .order("criado_em", { ascending: false })
+        .returns<RegistroProgresso[]>(),
+    ]);
+
+  const registrosComFoto = await Promise.all(
+    (registros ?? []).map(async (registro) => ({
+      ...registro,
+      urlFoto: registro.foto_url
+        ? await getUrlAssinadaFoto(supabase, registro.foto_url)
+        : null,
+    }))
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -82,6 +105,31 @@ export default async function PerfilPage() {
 
       <Card className="rounded-2xl">
         <CardHeader>
+          <CardTitle>Meus planos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {planosVinculados.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {planosVinculados.map((plano) => (
+                <Badge
+                  key={plano.id}
+                  variant="secondary"
+                  className="rounded-full px-3 py-1"
+                >
+                  {plano.nome}
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Nenhum plano vinculado ainda. Fale com a administração.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="rounded-2xl">
+        <CardHeader>
           <CardTitle>Dados pessoais</CardTitle>
         </CardHeader>
         <CardContent>
@@ -91,19 +139,11 @@ export default async function PerfilPage() {
 
       <Card className="rounded-2xl">
         <CardHeader>
-          <CardTitle>Fotos</CardTitle>
+          <CardTitle>Progresso</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
-          <UploadFoto
-            tipo="antes"
-            label="Foto antes"
-            fotoAtualUrl={profile.foto_antes_url}
-          />
-          <UploadFoto
-            tipo="atual"
-            label="Foto atual"
-            fotoAtualUrl={profile.foto_atual_url}
-          />
+          <FormRegistroProgresso />
+          <LinhaTempoProgresso registros={registrosComFoto} />
         </CardContent>
       </Card>
     </div>
