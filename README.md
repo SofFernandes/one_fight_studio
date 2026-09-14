@@ -37,14 +37,20 @@ npm run dev
 
 ## Criando o primeiro admin
 
-Depois de criar uma conta pela tela de login (ela nasce com papel `aluna`
-por padrão), promova-a a admin rodando no SQL Editor do Supabase:
+Como ainda não existe nenhum admin logado para acessar `/admin/configuracoes`, o
+primeiro precisa ser promovido manualmente: crie uma conta pela tela de login (ela
+nasce com papel `aluna` por padrão) e rode no SQL Editor do Supabase:
 
 ```sql
 update public.profiles set papel = 'admin' where id = '<uuid-do-usuario>';
 ```
 
 O UUID aparece em **Authentication > Users** no painel do Supabase.
+
+A partir do primeiro admin, os demais podem ser criados direto pela tela
+**Configurações** do admin (`/admin/configuracoes`), que também permite promover
+qualquer aluna existente a admin, rebaixar um admin de volta e trocar a senha de
+qualquer usuário.
 
 ## Estrutura
 
