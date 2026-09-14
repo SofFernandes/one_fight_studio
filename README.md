@@ -1,4 +1,4 @@
-# One Fight Studio — Portal de Alunas
+# One Studio Fight — Portal de Alunas
 
 Portal para academia de luta: login de alunas, dados pessoais, linha do tempo de
 progresso (foto + peso + altura), consulta de mensalidade, e dashboard de admin com

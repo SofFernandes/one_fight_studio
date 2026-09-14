@@ -25,7 +25,7 @@ export default function LoginPage() {
           <div className="flex flex-col items-center gap-8 text-center">
             <Image
               src="/one_fight_logo.jpg"
-              alt="One Fight Studio"
+              alt="One Studio Fight"
               width={112}
               height={112}
               priority
@@ -33,7 +33,7 @@ export default function LoginPage() {
             />
             <div>
               <h1 className="font-heading text-2xl font-semibold tracking-wide text-primary">
-                One Fight Studio
+                One Studio Fight
               </h1>
               <p className="text-sm text-muted-foreground">
                 Entre com seu e-mail e senha

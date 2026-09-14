@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "One Fight Studio",
-  description: "Portal de alunas — One Fight Studio",
+  title: "One Studio Fight",
+  description: "Portal de alunas — One Studio Fight",
 };
 
 export default function RootLayout({
